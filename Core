@@ -1,0 +1,189 @@
+import java.util.ArrayList;
+import java.util.Scanner;
+import java.util.Hashtable;
+import java.awt.Point;
+import java.util.List;
+import java.util.Map;
+import java.lang.Math;
+import java.io.*;
+import java.util.Scanner;
+import java.lang.Double;
+import java.awt.geom.Point2D.Double;
+// This Program works on normal computers, but does not work correctly on school laptops due to permissions issues
+//Please notify me of any changes you have made or would like to make to the code. If you have an editor installed on your computer, then run it on there.
+
+class Main {
+  public static void main(String[] args) {
+    try
+    {
+      //Enter the filenames of the csv files for the independent and dependent variables below
+      String pathToDependentVarCsv = "";
+      String pathToIndependentVarCsv = "";
+      //Intializes 2 ArrayList<Object> for the 2 variables given. (They are ArrayList<Objects> so that they can be filled with Integer objects or Double objects). The method call inside the ArrayList<Object> initialization allows the numbers from the file to be inserted into the ArrayList directly
+      ArrayList<Object> dependent = new ArrayList<Object>(getNumbersFromCsvFile(pathToDependentVarCsv));
+      ArrayList<Object> independent = new ArrayList<Object>(getNumbersFromCsvFile(pathToIndependentVarCsv));
+      System.out.println(dependent);
+      System.out.println(independent);
+      for (int i = 0; i <  independent.size(); i++){
+        System.out.println(i + " " + dependent.get(i) + independent.get(i));
+      }    
+    }catch( Exception e )
+    {
+     System.out.println(e.getMessage());
+    }
+  }
+  //Method to retrieve information from a Csv file when given a file name
+  public static ArrayList<Object> getNumbersFromCsvFile(String pathTocsv){
+    ArrayList<Object> d = new ArrayList<Object>();
+    try{
+    BufferedReader csvReader = new BufferedReader(new FileReader(pathTocsv));
+    String row = csvReader.readLine();
+    while ((row = csvReader.readLine()) != null) {
+      String[] data = row.split(",");
+      if( data.length >= 4 )
+      {
+      String val = data[3];
+      val = val.replace("\"", "");            
+      double dvar = Double.parseDouble(val);
+      d.add(dvar);
+      }
+    }
+    csvReader.close();
+    }catch(Exception e){
+      System.out.print(e.getMessage());
+    }
+
+
+  return d;
+  }
+  //Methods to return a pearson's correlation when given an independent and dependent variable. Some of these are for returning a pearsons with only one list. These are for finding the correlation of your variable with the progress of time.
+  static float correlationCoefficientAListDouble(ArrayList<Double> X, ArrayListDouble> Y, int n){
+    float sum_X = 0, sum_Y = 0, sum_XY = 0;
+    float squareSum_X = 0, squareSum_Y = 0;
+      
+    for (int i = 0; i < n; i++)
+    {
+        // sum of elements of array X.
+        sum_X = sum_X + X.get(i);
+      
+         // sum of elements of array Y.
+        sum_Y = sum_Y + Y.get(i);
+      
+        // sum of X[i] * Y[i].
+        sum_XY = sum_XY + X.get(i) * Y.get(i);
+      
+        // sum of square of array elements.
+        squareSum_X = squareSum_X + X.get(i) * X.get(i);
+        squareSum_Y = squareSum_Y + Y.get(i) * Y.get(i);
+    }
+      
+    // use formula for calculating correlation
+    // coefficient.
+    float corr = (float)(n * sum_XY - sum_X * sum_Y)/
+    (float)(Math.sqrt((n * squareSum_X -
+    sum_X * sum_X) * (n * squareSum_Y -
+    sum_Y * sum_Y)));
+      
+    return corr;
+  }
+  static float correlationCoefficientInteger(ArrayList<Integer> X, ArrayList<Integer> Y, int n){
+    int sum_X = 0, sum_Y = 0, sum_XY = 0;
+    int squareSum_X = 0, squareSum_Y = 0;
+      
+    for (int i = 0; i < n; i++)
+    {
+        // sum of elements of array X.
+        sum_X = sum_X + X.get(i);
+      
+         // sum of elements of array Y.
+        sum_Y = sum_Y + Y.get(i);
+      
+        // sum of X[i] * Y[i].
+        sum_XY = sum_XY + X.get(i) * Y.get(i);
+      
+        // sum of square of array elements.
+        squareSum_X = squareSum_X + X.get(i) * X.get(i);
+        squareSum_Y = squareSum_Y + Y.get(i) * Y.get(i);
+    }
+      
+    // use formula for calculating correlation
+    // coefficient.
+    float corr = (float)(n * sum_XY - sum_X * sum_Y)/
+    (float)(Math.sqrt((n * squareSum_X -
+    sum_X * sum_X) * (n * squareSum_Y -
+    sum_Y * sum_Y)));
+      
+    return corr;
+  }
+   static float correlationCoefficientDouble(ArrayList<Double> X, ArrayListDouble> Y, int n){
+    float sum_X = 0, sum_Y = 0, sum_XY = 0;
+    float squareSum_X = 0, squareSum_Y = 0;
+      
+    for (int i = 0; i < n; i++)
+    {
+        // sum of elements of array X.
+        sum_X = sum_X + X.get(i);
+      
+         // sum of elements of array Y.
+        sum_Y = sum_Y + Y.get(i);
+      
+        // sum of X[i] * Y[i].
+        sum_XY = sum_XY + X.get(i) * Y.get(i);
+      
+        // sum of square of array elements.
+        squareSum_X = squareSum_X + X.get(i) * X.get(i);
+        squareSum_Y = squareSum_Y + Y.get(i) * Y.get(i);
+    }
+      
+    // use formula for calculating correlation
+    // coefficient.
+    float corr = (float)(n * sum_XY - sum_X * sum_Y)/
+    (float)(Math.sqrt((n * squareSum_X -
+    sum_X * sum_X) * (n * squareSum_Y -
+    sum_Y * sum_Y)));
+      
+    return corr;
+  }
+  static float correlationCoefficientOverTime( ArrayList<Integer> Y, int n){    
+  ArrayList<Integer> X = new ArrayList<Integer>();
+    for (int g = 0; g < Y.size(); g++){
+      X.add(g);
+    }  
+    int sum_X = 0, sum_Y = 0, sum_XY = 0;
+    int squareSum_X = 0, squareSum_Y = 0;
+    for (int i = 0; i < n; i++)
+    {
+        // sum of elements of array X.
+        sum_X = sum_X + X.get(i);
+      
+         // sum of elements of array Y.
+        sum_Y = sum_Y + Y.get(i);
+      
+        // sum of X[i] * Y[i].
+        sum_XY = sum_XY + X.get(i) * Y.get(i);
+      
+        // sum of square of array elements.
+        squareSum_X = squareSum_X + X.get(i) * X.get(i);
+        squareSum_Y = squareSum_Y + Y.get(i) * Y.get(i);
+    }
+      
+    // use formula for calculating correlation
+    // coefficient.
+    float corr = (float)(n * sum_XY - sum_X * sum_Y)/
+    (float)(Math.sqrt((n * squareSum_X -
+    sum_X * sum_X) * (n * squareSum_Y -
+    sum_Y * sum_Y)));
+      
+    return corr;
+  }
+  public static ArrayList<Point2D.Double> GeneratePoints(ArrayList<Double> X_list, ArrayList<Double> Y_list){
+    Point2D.Double p = new Point();
+    ArrayList<Point2D.Double> p_list = new ArrayList<Point2D.Double>();
+    for (int a = 0; a < X.size(); a++){
+      p.setLocation(X_list.get(a), Y_List.get(a));
+      Point p_in_list = new Point(p);
+      p_list.add(p_in_list);
+    }
+    return p_list;
+  }
+}
