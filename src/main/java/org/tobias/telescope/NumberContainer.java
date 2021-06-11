@@ -8,13 +8,13 @@ public class NumberContainer {
   private double b;
   private int c;
 
-  // Constructs a numberContainer from 2 doubles
+  // Constructs a numberContainer from 2 doubles and one int
   public NumberContainer(double a, double b, int c) {
     this.a = a;
     this.b = b;
     this.c = 0;
   }
-
+  // Constructs a numberContainer from 3 ints
   public NumberContainer(int a, int b, int c) {
     this.a = (double) a;
     this.b = (double) b;

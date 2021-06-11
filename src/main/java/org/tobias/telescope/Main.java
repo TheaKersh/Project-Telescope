@@ -124,20 +124,30 @@ class Main {
      * if (equivalentCountryNames.get(Country) == null){ throw
      * Exception("Country Name not recognized"); }
      */
+    //Checks if given file is a csv file
     if (!(u.getFile().substring(u.getFile().length() - 3).equals("csv"))) {
       System.out.println(u.getFile().substring(u.getFile().length() - 3));
       System.out.println("Not a csv file");
       return null;
     }
     try {
+      //Creates a BufferedReader object to read the file with
       BufferedReader read = new BufferedReader(new InputStreamReader(u.openStream()));
+      //Reads the first line of the file(var names)
       String row = read.readLine();
-      while ((row = read.readLine()) != null) {
+      //Loops through the csv file from the given URL until it reaches the end of it.
+      while ((read.readLine()) != null) {
+        //Splits the line into a String[]
         String[] data = read.readLine().split(",");
+        //Checks the length of the line
         if (data.length >= 4) {
+          //Gets the numerical data and the year collected in string form
           String val = data[8];
           String year_string = data[4];
+          //Checks that the country name matches the country given in the method call
           if (Country.equals(data[1])) {
+            //Gets a double and an int from the Strings above
+            //And sets the corresponding values of temp to them
             double dvar = Double.parseDouble(val);
             int year = Integer.parseInt(year_string);
             temp.setA(dvar);
@@ -155,7 +165,4 @@ class Main {
     return fromLink;
   }
 }
-/*
- * Class to contain necessary numerical data(1 int, 2 doubles). The int is the
- * common factor(e.g time). The doubles are the data from the given .csv files
- */
+
