@@ -117,7 +117,7 @@ class Main {
     return listOfCoordinates;
   }
 
-  public static ArrayList<NumberContainer> getListFromCsvUrl(URL u, String Country) {
+  public static ArrayList<NumberContainer> getListFromCsvUrl(URL u, String Country, String var) {
     ArrayList<NumberContainer> fromLink = new ArrayList<NumberContainer>();
     NumberContainer temp = new NumberContainer();
     /*
@@ -133,9 +133,25 @@ class Main {
     try {
       //Creates a BufferedReader object to read the file with
       BufferedReader read = new BufferedReader(new InputStreamReader(u.openStream()));
+      int indexOfVar = 0;
       //Reads the first line of the file(var names)
       String row = read.readLine();
-      //Loops through the csv file from the given URL until it reaches the end of it.
+      int d = 0;
+      row = " " + row;
+      for (int a = 0; a < read.length(); a++){
+        if (read.charAt(a) = ' '){
+          d++;
+          int g = 0;
+          String temp = "";
+          while (read.charAt(g+a+1) = 0){
+            temp+=read.charAt(g+a+1);
+            g++;
+          }
+          if (temp == var){
+            indexOfVar = d;
+          }
+        }
+       //Loops through the csv file from the given URL until it reaches the end of it.
       while ((read.readLine()) != null) {
         //Splits the line into a String[]
         String[] data = read.readLine().split(",");
