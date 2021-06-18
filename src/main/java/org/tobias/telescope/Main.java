@@ -2,6 +2,7 @@ package org.tobias.telescope;
 
 import java.util.ArrayList;
 import java.util.Scanner;
+
 import java.util.Hashtable;
 import java.awt.Point;
 import java.util.List;
@@ -16,18 +17,23 @@ class Main {
   public static void main(String[] args) {
     try {
       // Enter the URLs
-      URL dependent = new URL(
-          "https://population.un.org/wpp/Download/Files/1_Indicators%20(Standard)/CSV_FILES/WPP2019_TotalPopulationBySex.csv");
+      URL dependent = new URL("https://population.un.org/wpp/Download/Files/1_Indicators%20(Standard)/CSV_FILES/WPP2019_TotalPopulationBySex.csv");
       // URL independent = new
       // URL("https://data.un.org/Data.aspx?q=united+states&d=PopDiv&f=variableID%3a12%3bcrID%3a840%2c850");
-      ArrayList<NumberContainer> n_list = new ArrayList<NumberContainer>(
-          getListFromCsvUrl(dependent, "United States of America"));
-      ArrayList<Double> d_list = new ArrayList<Double>();
-      ArrayList<Integer> int_list = new ArrayList<Integer>();
-      for (NumberContainer b : n_list) {
-        d_list.add(b.getA());
-        int_list.add(b.getC());
+      BufferedReader read = new BufferedReader(new InputStreamReader(dependent.openStream()));
+      System.out.println(read.readLine());
+      ArrayList<NumberContainer> n_list = new ArrayList<NumberContainer>(getListFromCsvUrl(dependent, "United States of America", "PopTotal"));
+      for (NumberContainer n : n_list){
+        System.out.println(n.getA());
+        System.out.println(n.getC());
       }
+
+      //ArrayList<Double> d_list = new ArrayList<Double>();
+      //ArrayList<Integer> int_list = new ArrayList<Integer>();
+      //for (NumberContainer b : n_list) {
+        //d_list.add(b.getA());
+        //int_list.add(b.getC());
+      //}
 
       /*
        * Hashtable equivalentCountryNames = new Hashtable<String, String>(); String[]
@@ -65,32 +71,39 @@ class Main {
     double squareSum_X = 0, squareSum_Y = 0;
 
     for (int i = 0; i < n; i++) {
-      // sum of elements of array X.
       sum_X = sum_X + XandY.get(i).getA();
-
-      // sum of elements of array Y.
       sum_Y = sum_Y + XandY.get(i).getB();
-
-      // sum of X[i] * Y[i].
       sum_XY = sum_XY + XandY.get(i).getA() * XandY.get(i).getB();
-
-      // sum of square of array elements.
       squareSum_X = squareSum_X + XandY.get(i).getA() * XandY.get(i).getA();
       squareSum_Y = squareSum_Y + XandY.get(i).getB() * XandY.get(i).getB();
     }
-
-    // use formula for calculating correlation
-    // coefficient.
-    double corr = (n * sum_XY - sum_X * sum_Y)
-        / (Math.sqrt((n * squareSum_X - sum_X * sum_X) * (n * squareSum_Y - sum_Y * sum_Y)));
-
+    double corr = (n * sum_XY - sum_X * sum_Y)/ (Math.sqrt((n * squareSum_X - sum_X * sum_X) * (n * squareSum_Y - sum_Y * sum_Y)));
     return corr;
   }
 
   /* Method to return the first line of a csv file */
-  public static int getColumnOfVariable(BufferedReader read, String varToGet) throws IOException {
+  public static int[] getColumnOfVariable(BufferedReader read, String varToGet, String country) throws IOException {
     String firstRow = read.readLine();
     String[] splitFirstRow = firstRow.split(",");
+    int[] indices = new int[3];
+    for (int a = 0; a < splitFirstRow.length; a++) {
+      if (splitFirstRow[a].equals(country)){
+        indices[0] = a;
+      }
+      if (splitFirstRow[a].equals("Time")){
+        indices[1] = a;
+      }
+      if (splitFirstRow[a].equals(varToGet)) {
+        indices[2] = a;
+      }
+    }
+    if(indices[0] == 0){
+      throw new IllegalArgumentException();
+    }
+    return indices
+  }
+  public static int getColumnOfVariable(String row, String varToGet) throws IOException {
+    String[] splitFirstRow = row.split(",");
     for (int a = 0; a < splitFirstRow.length; a++) {
       if (splitFirstRow[a].equals(varToGet)) {
         return a;
@@ -106,20 +119,17 @@ class Main {
       for (int g = 0; g < Math.max(x.size(), y.size()); g++) {
         if (x.get(i).getC() == y.get(g).getC()) {
           temp.setA(x.get(i).getA());
-          temp.setB(x.get(i).getA());
+          temp.setB(y.get(i).getA());
           temp.setC(x.get(i).getC());
           listOfCoordinates.add(temp);
-        } else {
-          continue;
         }
       }
     }
     return listOfCoordinates;
   }
 
-  public static ArrayList<NumberContainer> getListFromCsvUrl(URL u, String Country, String var) {
+  public static ArrayList<NumberContainer> getListFromCsvUrl(URL u, String Country, String varToGet) {
     ArrayList<NumberContainer> fromLink = new ArrayList<NumberContainer>();
-    NumberContainer temp = new NumberContainer();
     /*
      * if (equivalentCountryNames.get(Country) == null){ throw
      * Exception("Country Name not recognized"); }
@@ -130,35 +140,26 @@ class Main {
       System.out.println("Not a csv file");
       return null;
     }
+    
     try {
       //Creates a BufferedReader object to read the file with
       BufferedReader read = new BufferedReader(new InputStreamReader(u.openStream()));
-      int indexOfVar = 0;
       //Reads the first line of the file(var names)
       String row = read.readLine();
-      int d = 0;
-      row = " " + row;
-      for (int a = 0; a < read.length(); a++){
-        if (read.charAt(a) = ' '){
-          d++;
-          int g = 0;
-          String temp = "";
-          while (read.charAt(g+a+1) = 0){
-            temp+=read.charAt(g+a+1);
-            g++;
-          }
-          if (temp == var){
-            indexOfVar = d;
-          }
-        }
-       //Loops through the csv file from the given URL until it reaches the end of it.
-      while ((read.readLine()) != null) {
+      //Call to the getColumnOfVariable method returns the index which the requested variable is stored at
+      int indexOf = getColumnOfVariable(row, varToGet);
+      if(indexOf == 0){
+        throw new IllegalArgumentException("The variable you are searching for was not in this database");
+      }
+      //Loops through the csv file from the given URL until it reaches the end of it.
+      String buffer = read.readLine();
+      while (buffer != null) {
         //Splits the line into a String[]
-        String[] data = read.readLine().split(",");
+        String[] data = buffer.split(",");
         //Checks the length of the line
-        if (data.length >= 4) {
+        if (data.length > 4) {
           //Gets the numerical data and the year collected in string form
-          String val = data[8];
+          String val = data[indexOf];
           String year_string = data[4];
           //Checks that the country name matches the country given in the method call
           if (Country.equals(data[1])) {
@@ -166,13 +167,15 @@ class Main {
             //And sets the corresponding values of temp to them
             double dvar = Double.parseDouble(val);
             int year = Integer.parseInt(year_string);
+            NumberContainer temp = new NumberContainer();
             temp.setA(dvar);
             temp.setC(year);
             fromLink.add(temp);
           }
           // val = val.replace("\"", "");
-
+          
         }
+        buffer = read.readLine();
       }
       read.close();
     }catch(Exception e){
@@ -181,4 +184,5 @@ class Main {
     return fromLink;
   }
 }
+
 
